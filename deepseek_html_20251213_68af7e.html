@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marjan's Daily Routine - A1 English</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #4a6fa5, #6b93c5);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .story-section {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4a6fa5;
+        }
+        
+        .story-title {
+            color: #4a6fa5;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        
+        .story-text {
+            font-size: 1.1rem;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.8;
+        }
+        
+        .highlight {
+            background-color: #fffacd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .exercises-section {
+            margin-top: 40px;
+        }
+        
+        .section-title {
+            color: #4a6fa5;
+            border-bottom: 3px solid #4a6fa5;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+        
+        .exercise {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .exercise:hover {
+            border-color: #4a6fa5;
+            box-shadow: 0 6px 15px rgba(74, 111, 165, 0.15);
+        }
+        
+        .question {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .options {
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            display: block;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #e0e0e0;
+            background-color: #f9f9f9;
+            font-size: 1.1rem;
+        }
+        
+        .option:hover {
+            background-color: #e8f4fc;
+            border-color: #3498db;
+        }
+        
+        .option.selected {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .result.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+        
+        .result.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .check-all-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto;
+            padding: 20px;
+            background: linear-gradient(to right, #4a6fa5, #6b93c5);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(74, 111, 165, 0.3);
+        }
+        
+        .check-all-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(74, 111, 165, 0.4);
+            background: linear-gradient(to right, #3a5f95, #5b83b5);
+        }
+        
+        .check-all-btn:active {
+            transform: translateY(-2px);
+        }
+        
+        .score-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 2px solid #4a6fa5;
+        }
+        
+        .score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #4a6fa5;
+            display: block;
+        }
+        
+        .score-label {
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .reset-btn {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background-color: #e68900;
+            transform: scale(1.05);
+        }
+        
+        .vocabulary-box {
+            background-color: #e8f4fc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 5px solid #3498db;
+        }
+        
+        .vocabulary-title {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+        
+        .vocabulary-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .vocabulary-item {
+            background-color: white;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .vocabulary-word {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .vocabulary-meaning {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .check-all-btn {
+                font-size: 1.3rem;
+                padding: 18px;
+            }
+            
+            .vocabulary-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Marjan's Daily Routine</h1>
+            <div class="subtitle">A1 Level English Reading and Exercises</div>
+        </header>
+        
+        <div class="content">
+            <div class="story-section">
+                <h2 class="story-title">Marjan's Day</h2>
+                <div class="story-text">
+                    <p>Marjan is a nurse. She works at a big hospital. Her day starts early. She <span class="highlight">gets up</span> at <span class="highlight">5:30 AM</span> every morning.</p>
+                    
+                    <p>At work, Marjan helps sick people. She gives them medicine. She talks to the patients. She works with other nurses and doctors.</p>
+                    
+                    <p>Marjan has lunch at <span class="highlight">1:00 PM</span>. She eats in the <span class="highlight">hospital cafeteria</span> with her friends from work.</p>
+                    
+                    <p>In the evening, Marjan goes home at <span class="highlight">7:00 PM</span>. She cooks dinner and sometimes watches TV. She also reads books or calls her friends.</p>
+                    
+                    <p>Marjan's job is not a <span class="highlight">9-5 job</span>. She works from <span class="highlight">7:00 AM to 7:00 PM</span>, three days a week. This means she works long hours but has more days off.</p>
+                    
+                    <p>Marjan <span class="highlight">does not see</span> her family a lot during the week because she works long hours. But she visits them on her days off.</p>
+                    
+                    <p>To relax, Marjan likes to <span class="highlight">listen to music</span> and <span class="highlight">go for walks</span> in the park. On weekends, she sometimes goes to the cinema with friends.</p>
+                    
+                    <p>Marjan <span class="highlight">likes her job</span> very much. She enjoys helping people. The work is hard, but it makes her happy.</p>
+                </div>
+            </div>
+            
+            <div class="vocabulary-box">
+                <h3 class="vocabulary-title">Useful Vocabulary</h3>
+                <div class="vocabulary-list">
+                    <div class="vocabulary-item">
+                        <div class="vocabulary-word">get up</div>
+                        <div class="vocabulary-meaning">wake up and leave bed</div>
+                    </div>
+                    <div class="vocabulary-item">
+                        <div class="vocabulary-word">nurse</div>
+                        <div class="vocabulary-meaning">person who helps sick people</div>
+                    </div>
+                    <div class="vocabulary-item">
+                        <div class="vocabulary-word">patients</div>
+                        <div class="vocabulary-meaning">sick people in hospital</div>
+                    </div>
+                    <div class="vocabulary-item">
+                        <div class="vocabulary-word">cafeteria</div>
+                        <div class="vocabulary-meaning">place to eat at work/school</div>
+                    </div>
+                    <div class="vocabulary-item">
+                        <div class="vocabulary-word">9-5 job</div>
+                        <div class="vocabulary-meaning">normal office hours (9 AM to 5 PM)</div>
+                    </div>
+                    <div class="vocabulary-item">
+                        <div class="vocabulary-word">relax</div>
+                        <div class="vocabulary-meaning">rest and feel calm</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercises-section">
+                <h2 class="section-title">Comprehension Exercises</h2>
+                <p>Read the questions and choose the correct answer.</p>
+                
+                <div class="exercise" id="exercise1">
+                    <div class="question">1. What time does Marjan get up?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q1" value="a">
+                            At 6:30 AM
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="b">
+                            At 5:30 AM
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="c">
+                            At 7:00 AM
+                        </label>
+                    </div>
+                    <div class="result" id="result1"></div>
+                </div>
+                
+                <div class="exercise" id="exercise2">
+                    <div class="question">2. What does she do when she's at work?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q2" value="a">
+                            She cooks food
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="b">
+                            She helps sick people
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="c">
+                            She teaches students
+                        </label>
+                    </div>
+                    <div class="result" id="result2"></div>
+                </div>
+                
+                <div class="exercise" id="exercise3">
+                    <div class="question">3. Where does she have lunch?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q3" value="a">
+                            At home
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="b">
+                            In a restaurant
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="c">
+                            In the hospital cafeteria
+                        </label>
+                    </div>
+                    <div class="result" id="result3"></div>
+                </div>
+                
+                <div class="exercise" id="exercise4">
+                    <div class="question">4. What does she do in the evening?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q4" value="a">
+                            She works more hours
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="b">
+                            She cooks dinner and relaxes
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="c">
+                            She goes to the gym
+                        </label>
+                    </div>
+                    <div class="result" id="result4"></div>
+                </div>
+                
+                <div class="exercise" id="exercise5">
+                    <div class="question">5. Is her job a 9-5 job? Why (not)?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q5" value="a">
+                            Yes, because she works from 9 AM to 5 PM
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="b">
+                            No, because she works from 7 AM to 7 PM
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="c">
+                            No, because she works at night
+                        </label>
+                    </div>
+                    <div class="result" id="result5"></div>
+                </div>
+                
+                <div class="exercise" id="exercise6">
+                    <div class="question">6. Does she see her family a lot?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q6" value="a">
+                            Yes, every day
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="b">
+                            No, not during the week
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="c">
+                            Yes, on weekends only
+                        </label>
+                    </div>
+                    <div class="result" id="result6"></div>
+                </div>
+                
+                <div class="exercise" id="exercise7">
+                    <div class="question">7. How does she relax?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q7" value="a">
+                            By watching TV and reading
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="b">
+                            By playing sports
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="c">
+                            By working more
+                        </label>
+                    </div>
+                    <div class="result" id="result7"></div>
+                </div>
+                
+                <div class="exercise" id="exercise8">
+                    <div class="question">8. Does she like her job?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q8" value="a">
+                            No, it's too hard
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="b">
+                            Yes, she likes helping people
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="c">
+                            Sometimes, when it's easy
+                        </label>
+                    </div>
+                    <div class="result" id="result8"></div>
+                </div>
+                
+                <button class="check-all-btn" id="check-all-btn">
+                    CHECK ANSWERS
+                </button>
+                
+                <div class="score-container">
+                    <div class="score-label">Your Score:</div>
+                    <div class="score" id="score">0/8</div>
+                    <button class="reset-btn" onclick="resetAll()">Try Again</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>A1 Level English Comprehension Exercise • Read the story and answer the questions</p>
+        </div>
+    </div>
+
+    <script>
+        // Correct answers for each question
+        const correctAnswers = {
+            1: 'b', // At 5:30 AM
+            2: 'b', // She helps sick people
+            3: 'c', // In the hospital cafeteria
+            4: 'b', // She cooks dinner and relaxes
+            5: 'b', // No, because she works from 7 AM to 7 PM
+            6: 'b', // No, not during the week
+            7: 'a', // By watching TV and reading
+            8: 'b'  // Yes, she likes helping people
+        };
+        
+        // Explanations for each question
+        const explanations = {
+            1: "Marjan gets up at 5:30 AM every morning.",
+            2: "Marjan is a nurse. She helps sick people at the hospital.",
+            3: "Marjan eats lunch in the hospital cafeteria with her friends.",
+            4: "In the evening, Marjan cooks dinner and sometimes watches TV or reads books.",
+            5: "Marjan works from 7:00 AM to 7:00 PM, which is not a 9-5 job.",
+            6: "Marjan does not see her family a lot during the week because she works long hours.",
+            7: "Marjan relaxes by listening to music, going for walks, watching TV, and reading books.",
+            8: "Marjan likes her job very much because she enjoys helping people."
+        };
+        
+        let score = 0;
+        let answered = 0;
+        const totalQuestions = 8;
+        
+        // Add click event listeners to all options
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    
+                    // Remove selected class from all options in this question
+                    const questionId = this.closest('.exercise').id;
+                    const allOptions = document.querySelectorAll(`#${questionId} .option`);
+                    allOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                }
+            });
+        });
+        
+        // Function to check all answers
+        function checkAllAnswers() {
+            score = 0;
+            answered = 0;
+            
+            // Check each question
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionName = `q${i}`;
+                const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                const resultElement = document.getElementById(`result${i}`);
+                const exerciseElement = document.getElementById(`exercise${i}`);
+                
+                if (selectedOption) {
+                    answered++;
+                    const userAnswer = selectedOption.value;
+                    const isCorrect = userAnswer === correctAnswers[i];
+                    
+                    // Get all options for this question
+                    const options = exerciseElement.querySelectorAll('.option');
+                    
+                    // Remove any previous correct/incorrect classes
+                    options.forEach(option => {
+                        option.classList.remove('correct', 'incorrect');
+                    });
+                    
+                    // Mark the correct answer
+                    const correctOption = exerciseElement.querySelector(`input[value="${correctAnswers[i]}"]`);
+                    if (correctOption) {
+                        correctOption.parentElement.classList.add('correct');
+                    }
+                    
+                    // Mark the user's answer if incorrect
+                    if (!isCorrect && selectedOption) {
+                        selectedOption.parentElement.classList.add('incorrect');
+                    }
+                    
+                    // Show result
+                    resultElement.innerHTML = isCorrect ? 
+                        `<strong>✓ Correct!</strong> ${explanations[i]}` :
+                        `<strong>✗ Incorrect.</strong> ${explanations[i]}`;
+                    
+                    resultElement.className = `result ${isCorrect ? 'correct' : 'incorrect'}`;
+                    resultElement.style.display = 'block';
+                    
+                    if (isCorrect) {
+                        score++;
+                    }
+                    
+                    // Disable all radio buttons for this question
+                    const radioButtons = exerciseElement.querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach(radio => {
+                        radio.disabled = true;
+                    });
+                    
+                    // Disable clicking on options
+                    options.forEach(option => {
+                        option.style.cursor = 'default';
+                        option.onclick = null;
+                    });
+                } else {
+                    // No answer selected
+                    const resultElement = document.getElementById(`result${i}`);
+                    resultElement.innerHTML = `<strong>No answer selected.</strong> ${explanations[i]}`;
+                    resultElement.className = 'result incorrect';
+                    resultElement.style.display = 'block';
+                }
+            }
+            
+            // Update score display
+            document.getElementById('score').textContent = `${score}/${totalQuestions}`;
+            
+            // Change the check button to show completion
+            const checkBtn = document.getElementById('check-all-btn');
+            checkBtn.textContent = 'ANSWERS CHECKED!';
+            checkBtn.style.background = 'linear-gradient(to right, #28a745, #34ce57)';
+            checkBtn.disabled = true;
+            checkBtn.style.cursor = 'default';
+            
+            // Show message based on score
+            let message = '';
+            if (score === totalQuestions) {
+                message = 'Perfect! Excellent job! 🎉';
+            } else if (score >= totalQuestions * 0.7) {
+                message = 'Good job! Well done! 👍';
+            } else if (score >= totalQuestions * 0.5) {
+                message = 'Not bad! Keep practicing! 💪';
+            } else {
+                message = 'Try again! You can do better! 📚';
+            }
+            
+            // Add message to score container
+            const scoreContainer = document.querySelector('.score-container');
+            const existingMessage = scoreContainer.querySelector('.message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.style.marginTop = '15px';
+            messageElement.style.fontSize = '1.2rem';
+            messageElement.style.fontWeight = 'bold';
+            messageElement.style.color = '#4a6fa5';
+            messageElement.textContent = message;
+            scoreContainer.insertBefore(messageElement, scoreContainer.querySelector('.reset-btn'));
+        }
+        
+        // Function to reset all answers
+        function resetAll() {
+            score = 0;
+            answered = 0;
+            
+            // Reset all questions
+            for (let i = 1; i <= totalQuestions; i++) {
+                const exerciseElement = document.getElementById(`exercise${i}`);
+                const resultElement = document.getElementById(`result${i}`);
+                
+                // Clear radio selections
+                const radioButtons = exerciseElement.querySelectorAll('input[type="radio"]');
+                radioButtons.forEach(radio => {
+                    radio.checked = false;
+                    radio.disabled = false;
+                });
+                
+                // Clear option classes
+                const options = exerciseElement.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.classList.remove('selected', 'correct', 'incorrect');
+                    option.style.cursor = 'pointer';
+                    
+                    // Re-enable click events
+                    option.onclick = function() {
+                        const radio = this.querySelector('input[type="radio"]');
+                        if (radio) {
+                            radio.checked = true;
+                            
+                            // Remove selected class from all options in this question
+                            const questionId = this.closest('.exercise').id;
+                            const allOptions = document.querySelectorAll(`#${questionId} .option`);
+                            allOptions.forEach(opt => opt.classList.remove('selected'));
+                            
+                            // Add selected class to clicked option
+                            this.classList.add('selected');
+                        }
+                    };
+                });
+                
+                // Hide results
+                resultElement.style.display = 'none';
+            }
+            
+            // Reset check button
+            const checkBtn = document.getElementById('check-all-btn');
+            checkBtn.textContent = 'CHECK ANSWERS';
+            checkBtn.style.background = 'linear-gradient(to right, #4a6fa5, #6b93c5)';
+            checkBtn.disabled = false;
+            checkBtn.style.cursor = 'pointer';
+            
+            // Reset score display
+            document.getElementById('score').textContent = '0/8';
+            
+            // Remove message
+            const messageElement = document.querySelector('.message');
+            if (messageElement) {
+                messageElement.remove();
+            }
+        }
+        
+        // Add event listener to the check button
+        document.getElementById('check-all-btn').addEventListener('click', checkAllAnswers);
+        
+        // Add keyboard shortcut (Enter key to check answers)
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.target.matches('input[type="radio"]')) {
+                event.preventDefault();
+                checkAllAnswers();
+            }
+        });
+    </script>
+</body>
+</html>
