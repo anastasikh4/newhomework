@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TH Sound Adventure!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bird-red: #f44336;
+            --pig-green: #8bc34a;
+            --wood-brown: #795548;
+            --sky-blue: #03a9f4;
+            --grass: #4caf50;
+            --comic-font: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive;
+        }
+
+        body {
+            font-family: var(--comic-font);
+            background: var(--sky-blue);
+            background: linear-gradient(180deg, var(--sky-blue) 0%, #ffffff 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--bird-red);
+            text-shadow: 3px 3px 0px #000;
+            margin: 20px 0;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 700px;
+            background: white;
+            border: 6px solid var(--wood-brown);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 12px 0px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--comic-font);
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.1);
+            transition: all 0.1s;
+            margin: 10px;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .btn-red { background: var(--bird-red); color: white; }
+        .btn-green { background: var(--pig-green); color: white; }
+        .btn-audio { background: #ff9800; color: white; border-bottom: 5px solid #e68a00; width: 100%; max-width: 250px;}
+
+        /* Score Display */
+        .stars-count {
+            font-size: 2rem;
+            background: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 4px solid var(--wood-brown);
+            margin-bottom: 20px;
+        }
+
+        /* Grid for Matching */
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .match-item {
+            background: #f9f9f9;
+            border: 3px solid #ccc;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .match-item.active { background: var(--pig-green); color: white; border-color: #558b2f; }
+        .match-item.hidden { opacity: 0; pointer-events: none; }
+
+        /* Unscramble Slots */
+        .slot {
+            display: inline-block;
+            width: 50px;
+            height: 60px;
+            border-bottom: 5px solid var(--wood-brown);
+            margin: 5px;
+            font-size: 2.2rem;
+            vertical-align: bottom;
+        }
+
+        /* Thumbs Up Pop-up */
+        #thumb-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 12rem;
+            z-index: 999;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .show-thumb { transform: translate(-50%, -50%) scale(1.5) !important; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>TH ATTACK! 👅</h1>
+    <div class="stars-count">Stars: <span id="star-total">0</span> ⭐</div>
+
+    <div id="thumb-overlay">👍</div>
+
+    <div class="game-container">
+        
+        <div id="screen-start">
+            <p style="font-size: 1.5rem;">Help the birds win by finding the "TH" sounds!</p>
+            <button class="btn btn-red" onclick="initMatching()">LET'S PLAY!</button>
+        </div>
+
+        <div id="screen-match" class="hidden">
+            <h3>Phase 1: Sound Match</h3>
+            <div class="match-grid" id="match-grid"></div>
+        </div>
+
+        <div id="screen-choice" class="hidden">
+            <h3 id="choice-title">Phase 2: Listen & Find</h3>
+            <button class="btn btn-audio" onclick="playTarget()">LISTEN 🔊</button>
+            <div id="choice-btns" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="screen-build" class="hidden">
+            <h3 id="build-title">Phase 3: Build the Word</h3>
+            <button class="btn btn-audio" onclick="playTarget()">LISTEN 🔊</button>
+            <div id="word-slots" style="margin: 25px 0;"></div>
+            <div id="letter-bank"></div>
+        </div>
+
+        <div id="screen-win" class="hidden">
+            <h2>🏆 YOU DID IT! 🏆</h2>
+            <p>You are a "TH" Master!</p>
+            <button class="btn btn-red" onclick="location.reload()">PLAY AGAIN</button>
+        </div>
+
+    </div>
+
+<script>
+    let stars = 0;
+    let wordIdx = 0;
+    let targetWord = "";
+    let currentGuess = "";
+
+    const thWords = [
+        "thin", "bath", "moth", "thumb", "three", 
+        "path", "math", "teeth", "cloth", "thick"
+    ];
+
+    function speak(txt) {
+        const msg = new SpeechSynthesisUtterance(txt);
+        msg.lang = 'en-US';
+        msg.rate = 0.7;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function playTarget() { speak(targetWord); }
+
+    function popThumb() {
+        const thumb = document.getElementById('thumb-overlay');
+        thumb.classList.add('show-thumb');
+        setTimeout(() => thumb.classList.remove('show-thumb'), 800);
+    }
+
+    function addStars(num) {
+        stars += num;
+        document.getElementById('star-total').innerText = stars;
+    }
+
+    // --- PHASE 1: MATCHING ---
+    let matchFirst = null;
+    function initMatching() {
+        document.getElementById('screen-start').classList.add('hidden');
+        document.getElementById('screen-match').classList.remove('hidden');
+        
+        let pairWords = ["thin", "bath", "moth", "three"];
+        let cards = [];
+        pairWords.forEach(w => {
+            cards.push({ type: 'sound', val: w });
+            cards.push({ type: 'text', val: w });
+        });
+        cards.sort(() => Math.random() - 0.5);
+
+        const grid = document.getElementById('match-grid');
+        cards.forEach(card => {
+            const el = document.createElement('div');
+            el.className = 'match-item';
+            el.innerHTML = card.type === 'sound' ? '🔊' : card.val;
+            
+            el.onclick = () => {
+                if(el.classList.contains('hidden') || el.classList.contains('active')) return;
+                if(card.type === 'sound') speak(card.val);
+                
+                el.classList.add('active');
+
+                if(!matchFirst) {
+                    matchFirst = { el, card };
+                } else {
+                    if(matchFirst.card.val === card.val && matchFirst.card.type !== card.type) {
+                        popThumb();
+                        addStars(5);
+                        let c1 = matchFirst.el;
+                        let c2 = el;
+                        setTimeout(() => {
+                            c1.classList.add('hidden');
+                            c2.classList.add('hidden');
+                            if(document.querySelectorAll('.match-item:not(.hidden)').length === 0) {
+                                initChoice();
+                            }
+                        }, 500);
+                        matchFirst = null;
+                    } else {
+                        let c1 = matchFirst.el;
+                        let c2 = el;
+                        setTimeout(() => {
+                            c1.classList.remove('active');
+                            c2.classList.remove('active');
+                        }, 500);
+                        matchFirst = null;
+                    }
+                }
+            };
+            grid.appendChild(el);
+        });
+    }
+
+    // --- PHASE 2: CHOOSING ---
+    function initChoice() {
+        document.getElementById('screen-match').classList.add('hidden');
+        document.getElementById('screen-choice').classList.remove('hidden');
+        wordIdx = 0;
+        loadChoiceRound();
+    }
+
+    function loadChoiceRound() {
+        if(wordIdx >= 4) { initBuild(); return; }
+        targetWord = thWords[wordIdx];
+        document.getElementById('choice-title').innerText = `Round ${wordIdx + 1}/4`;
+        
+        const area = document.getElementById('choice-btns');
+        area.innerHTML = '';
+        
+        let options = [targetWord, "tin", "bad"].sort(() => Math.random() - 0.5);
+        options.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn btn-green';
+            b.innerText = opt;
+            b.onclick = () => {
+                if(opt === targetWord) {
+                    popThumb();
+                    addStars(10);
+                    wordIdx++;
+                    setTimeout(loadChoiceRound, 1000);
+                } else {
+                    b.style.opacity = "0.3";
+                }
+            };
+            area.appendChild(b);
+        });
+    }
+
+    // --- PHASE 3: UNSCRAMBLE ---
+    function initBuild() {
+        document.getElementById('screen-choice').classList.add('hidden');
+        document.getElementById('screen-build').classList.remove('hidden');
+        wordIdx = 0;
+        loadBuildRound();
+    }
+
+    function loadBuildRound() {
+        if(wordIdx >= thWords.length) {
+            document.getElementById('screen-build').classList.add('hidden');
+            document.getElementById('screen-win').classList.remove('hidden');
+            return;
+        }
+
+        targetWord = thWords[wordIdx];
+        currentGuess = "";
+        document.getElementById('build-title').innerText = `Spelling: Word ${wordIdx + 1}/${thWords.length}`;
+        
+        const slots = document.getElementById('word-slots');
+        const bank = document.getElementById('letter-bank');
+        slots.innerHTML = '';
+        bank.innerHTML = '';
+
+        for(let i=0; i<targetWord.length; i++) {
+            const s = document.createElement('div');
+            s.className = 'slot';
+            s.id = 'slot-' + i;
+            slots.appendChild(s);
+        }
+
+        let scrambled = targetWord.split('').sort(() => Math.random() - 0.5);
+        scrambled.forEach(char => {
+            const b = document.createElement('button');
+            b.className = 'btn btn-red';
+            b.style.minWidth = '60px';
+            b.innerText = char;
+            b.onclick = () => {
+                document.getElementById('slot-' + currentGuess.length).innerText = char;
+                currentGuess += char;
+                b.style.visibility = 'hidden';
+
+                if(currentGuess.length === targetWord.length) {
+                    if(currentGuess === targetWord) {
+                        popThumb();
+                        addStars(20);
+                        wordIdx++;
+                        setTimeout(loadBuildRound, 1000);
+                    } else {
+                        // Reset if wrong
+                        setTimeout(loadBuildRound, 600);
+                    }
+                }
+            };
+            bank.appendChild(b);
+        });
+    }
+</script>
+
+</body>
+</html>
