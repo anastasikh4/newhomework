@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TH Sound Adventure!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bird-red: #f44336;
+            --pig-green: #8bc34a;
+            --wood-brown: #795548;
+            --sky-blue: #03a9f4;
+            --th-color: #9c27b0;
+            --comic-font: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', cursive;
+        }
+
+        body {
+            font-family: var(--comic-font);
+            background: linear-gradient(180deg, var(--sky-blue) 0%, #ffffff 100%);
+            margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: #333;
+        }
+
+        h1 { font-size: 3.5rem; color: var(--bird-red); text-shadow: 3px 3px 0px #000; margin: 20px 0; }
+
+        .game-container {
+            width: 95%; max-width: 850px; background: white; border: 6px solid var(--wood-brown);
+            border-radius: 30px; padding: 30px; box-shadow: 0 12px 0px rgba(0,0,0,0.2); text-align: center;
+        }
+
+        .hl-th { color: var(--th-color); text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
+
+        .btn {
+            font-family: var(--comic-font); font-weight: bold; border: none; border-radius: 15px;
+            padding: 15px 30px; font-size: 1.4rem; cursor: pointer; margin: 10px; transition: all 0.1s;
+        }
+        .btn-red { background: var(--bird-red); color: white; }
+        .btn-green { background: var(--pig-green); color: white; }
+        .btn-audio { background: #ff9800; color: white; border-bottom: 5px solid #e68a00; width: 100%; max-width: 300px;}
+
+        .stars-count { font-size: 2rem; background: white; padding: 10px 25px; border-radius: 50px; border: 4px solid var(--wood-brown); margin-bottom: 20px; }
+
+        .match-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        @media (min-width: 600px) { .match-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .match-item {
+            background: #f9f9f9; border: 4px solid #ccc; min-height: 110px; display: flex;
+            align-items: center; justify-content: center; font-size: 2.8rem; border-radius: 15px; cursor: pointer;
+            box-shadow: inset -4px -4px 0px #ddd;
+        }
+        .match-item.active { background: var(--pig-green); color: white; border-color: #558b2f; }
+        .match-item.hidden { opacity: 0; pointer-events: none; }
+
+        .slot {
+            display: inline-block; width: 55px; height: 65px; border-bottom: 5px solid var(--wood-brown);
+            margin: 5px; font-size: 2.5rem; vertical-align: bottom; line-height: 65px;
+        }
+
+        #thumb-overlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            font-size: 12rem; z-index: 999; pointer-events: none; transition: transform 0.4s;
+        }
+        .show-thumb { transform: translate(-50%, -50%) scale(1.5) !important; opacity: 1; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>TH ATTACK! 👅</h1>
+    <div class="stars-count">Stars: <span id="star-total">0</span> ⭐</div>
+    <div id="thumb-overlay">👍</div>
+
+    <div class="game-container">
+        <div id="screen-start">
+            <p style="font-size: 1.8rem;">Stage 1: The Small Forest</p>
+            <button class="btn btn-red" onclick="initMatching(1)">START QUEST!</button>
+        </div>
+
+        <div id="screen-match" class="hidden">
+            <h3 id="match-stage-title">Phase 1: Sound Match</h3>
+            <div class="match-grid" id="match-grid"></div>
+        </div>
+
+        <div id="screen-choice" class="hidden">
+            <h3 id="choice-title">Phase 2: Listen & Find</h3>
+            <button class="btn btn-audio" onclick="playTarget()">LISTEN 🔊</button>
+            <div id="choice-btns" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="screen-build" class="hidden">
+            <h3 id="build-title">Phase 3: Build the Word</h3>
+            <button class="btn btn-audio" onclick="playTarget()">LISTEN 🔊</button>
+            <div id="word-slots" style="margin: 25px 0;"></div>
+            <div id="letter-bank"></div>
+        </div>
+
+        <div id="screen-win" class="hidden">
+            <h2 style="font-size: 3rem; color: #ffeb3b; text-shadow: 2px 2px #000;">🏆 MISSION COMPLETE! 🏆</h2>
+            <button class="btn btn-red" onclick="location.reload()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+<script>
+    let stars = 0, wordIdx = 0, targetWord = "", currentGuess = "", maleVoice = null;
+    let currentPhase1Stage = 1;
+
+    const challengeBank = [
+        { word: "thin", traps: ["tin", "than"] }, { word: "bath", traps: ["both", "bash"] },
+        { word: "moth", traps: ["math", "moss"] }, { word: "thumb", traps: ["thump", "dumb"] },
+        { word: "three", traps: ["tree", "free"] }, { word: "path", traps: ["patch", "math"] },
+        { word: "teeth", traps: ["tease", "tenth"] }, { word: "thick", traps: ["tick", "think"] }
+    ];
+
+    const buildBank = ["thin", "bath", "moth", "thumb", "three", "path", "math", "teeth", "cloth", "thick"];
+
+    function loadVoices() {
+        const voices = window.speechSynthesis.getVoices();
+        maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('David')) || voices[0];
+    }
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    function speak(txt) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(txt);
+        if (maleVoice) msg.voice = maleVoice;
+        msg.lang = 'en-US'; msg.rate = 0.75;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function playTarget() { speak(targetWord); }
+
+    function popThumb() {
+        const thumb = document.getElementById('thumb-overlay');
+        thumb.classList.add('show-thumb');
+        setTimeout(() => thumb.classList.remove('show-thumb'), 800);
+    }
+
+    function addStars(num) { stars += num; document.getElementById('star-total').innerText = stars; }
+
+    function formatTH(word) {
+        return word.replace(/th/gi, '<span class="hl-th">th</span>');
+    }
+
+    // --- PHASE 1: MATCHING (NOW WITH 2 STAGES) ---
+    function initMatching(stage) {
+        currentPhase1Stage = stage;
+        document.getElementById('screen-start').classList.add('hidden');
+        document.getElementById('screen-match').classList.remove('hidden');
+        
+        const title = document.getElementById('match-stage-title');
+        title.innerText = `Phase 1: Stage ${stage} / 2`;
+
+        // Stage 1: 4 words, Stage 2: 6 words
+        let pairWords = stage === 1 ? ["thin", "bath", "moth", "three"] : ["path", "math", "teeth", "cloth", "thick", "thumb"];
+        
+        let cards = [];
+        pairWords.forEach(w => { cards.push({ type: 'sound', val: w }, { type: 'text', val: w }); });
+        cards.sort(() => Math.random() - 0.5);
+        
+        const grid = document.getElementById('match-grid');
+        grid.innerHTML = '';
+        let matchFirst = null;
+
+        cards.forEach(card => {
+            const el = document.createElement('div');
+            el.className = 'match-item';
+            el.innerHTML = card.type === 'sound' ? '🔊' : formatTH(card.val);
+            
+            el.onclick = () => {
+                if(card.type === 'sound') speak(card.val);
+                if(el.classList.contains('hidden') || el.classList.contains('active')) return;
+                el.classList.add('active');
+                if(!matchFirst) { matchFirst = { el, card }; } 
+                else {
+                    if(matchFirst.card.val === card.val && matchFirst.card.type !== card.type) {
+                        popThumb(); addStars(5);
+                        let c1 = matchFirst.el, c2 = el;
+                        setTimeout(() => {
+                            c1.classList.add('hidden'); c2.classList.add('hidden');
+                            if(document.querySelectorAll('.match-item:not(.hidden)').length === 0) {
+                                if(currentPhase1Stage === 1) {
+                                    setTimeout(() => initMatching(2), 600);
+                                } else {
+                                    initChoice();
+                                }
+                            }
+                        }, 500);
+                        matchFirst = null;
+                    } else {
+                        let c1 = matchFirst.el, c2 = el;
+                        setTimeout(() => { c1.classList.remove('active'); c2.classList.remove('active'); }, 500);
+                        matchFirst = null;
+                    }
+                }
+            };
+            grid.appendChild(el);
+        });
+    }
+
+    // --- PHASE 2: CHOOSING (8 QUESTIONS, NO COLOR) ---
+    function initChoice() {
+        document.getElementById('screen-match').classList.add('hidden');
+        document.getElementById('screen-choice').classList.remove('hidden');
+        wordIdx = 0; loadChoiceRound();
+    }
+
+    function loadChoiceRound() {
+        if(wordIdx >= challengeBank.length) { initBuild(); return; }
+        let current = challengeBank[wordIdx];
+        targetWord = current.word;
+        document.getElementById('choice-title').innerText = `Challenge ${wordIdx + 1}/8`;
+        const area = document.getElementById('choice-btns');
+        area.innerHTML = '';
+        let options = [targetWord, ...current.traps].sort(() => Math.random() - 0.5);
+        options.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn btn-green';
+            b.innerText = opt;
+            b.onclick = () => {
+                if(opt === targetWord) { popThumb(); addStars(10); wordIdx++; setTimeout(loadChoiceRound, 1000); }
+                else { b.style.opacity = "0.3"; speak(opt); }
+            };
+            area.appendChild(b);
+        });
+    }
+
+    // --- PHASE 3: BUILDING (WITH COLOR) ---
+    function initBuild() {
+        document.getElementById('screen-choice').classList.add('hidden');
+        document.getElementById('screen-build').classList.remove('hidden');
+        wordIdx = 0; loadBuildRound();
+    }
+
+    function loadBuildRound() {
+        if(wordIdx >= buildBank.length) {
+            document.getElementById('screen-build').classList.add('hidden');
+            document.getElementById('screen-win').classList.remove('hidden');
+            return;
+        }
+        targetWord = buildBank[wordIdx];
+        currentGuess = "";
+        document.getElementById('build-title').innerText = `Build: Word ${wordIdx + 1}/${buildBank.length}`;
+        const slots = document.getElementById('word-slots'), bank = document.getElementById('letter-bank');
+        slots.innerHTML = ''; bank.innerHTML = '';
+
+        for(let i=0; i<targetWord.length; i++) {
+            const s = document.createElement('div');
+            s.className = 'slot'; s.id = 'slot-' + i;
+            slots.appendChild(s);
+        }
+
+        let scrambled = targetWord.split('').sort(() => Math.random() - 0.5);
+        scrambled.forEach(char => {
+            const b = document.createElement('button');
+            b.className = 'btn btn-red'; b.style.minWidth = '65px'; b.innerText = char;
+            b.onclick = () => {
+                let slot = document.getElementById('slot-' + currentGuess.length);
+                slot.innerText = char;
+                currentGuess += char;
+                b.style.visibility = 'hidden';
+
+                if(currentGuess.length === targetWord.length) {
+                    // Re-render slots to apply color
+                    slots.innerHTML = formatTH(currentGuess);
+                    if(currentGuess === targetWord) {
+                        popThumb(); addStars(20); wordIdx++; setTimeout(loadBuildRound, 1000);
+                    } else { setTimeout(loadBuildRound, 600); }
+                }
+            };
+            bank.appendChild(b);
+        });
+    }
+</script>
+</body>
+</html>
