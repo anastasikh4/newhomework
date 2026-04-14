@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Magic Park: Plurals, Can / Can't & Reading — Pre-A1 (Grade 2)</title>
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#f7fbff;
+    --card:#ffffff;
+    --accent:#0b3d91; /* dark blue */
+    --accent-2:#0b6b47; /* dark green */
+    --muted:#5b6b7a;
+    --good:#2e8b57;
+    --bad:#c0392b;
+    --pulse: 1.06;
+    font-family: 'Raleway', Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#eaf4ff 0%,var(--bg) 100%);color:#132233;}
+  header{
+    padding:18px 20px;border-bottom:6px solid rgba(11,61,145,0.08);
+    display:flex;align-items:center;gap:18px;background:transparent;
+  }
+  .logo{
+    display:flex;flex-direction:column;line-height:1;
+  }
+  .title{font-size:20px;font-weight:700;color:var(--accent)}
+  .subtitle{font-size:13px;color:var(--muted)}
+  .nav{
+    margin-left:auto;display:flex;gap:8px;align-items:center;
+  }
+
+  /* Tab radio controls */
+  .tabs{display:flex;gap:8px}
+  .tabs input{display:none}
+  .tabs label{
+    padding:10px 14px;border-radius:10px;background:linear-gradient(180deg,#fff,#f1f7ff);
+    border:2px solid rgba(11,61,145,0.06);cursor:pointer;font-weight:600;color:var(--accent);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .tabs label:hover{transform:translateY(-2px)}
+  input#tab-vocab:checked + label[for="tab-vocab"],
+  input#tab-grammar:checked + label[for="tab-grammar"],
+  input#tab-reading:checked + label[for="tab-reading"]{
+    box-shadow:0 6px 18px rgba(11,61,145,0.12);
+    transform:scale(var(--pulse));
+    border-color:var(--accent);
+    background:linear-gradient(180deg,#e6f0ff,#fff);
+  }
+
+  main{max-width:980px;margin:20px auto;padding:18px;}
+
+  .panel{background:var(--card);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 6px 20px rgba(20,40,80,0.03);
+    opacity:0;transform:translateY(10px);animation:fadeIn .5s forwards;}
+  @keyframes fadeIn{to{opacity:1;transform:none}}
+
+  h2{margin:6px 0 12px;font-size:18px;color:var(--accent)}
+  p.lead{margin:0 0 8px;color:var(--muted)}
+
+  /* Content toggles via :checked */
+  .tab-content{display:none}
+  #tab-vocab:checked ~ main #vocabulary,
+  #tab-grammar:checked ~ main #grammar,
+  #tab-reading:checked ~ main #reading{
+    display:block;
+  }
+
+  /* Layout for exercises */
+  .exercise{margin:12px 0;padding:12px;border-radius:10px;border:1px dashed rgba(11,61,145,0.06)}
+  .ex-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .rule-box{border-left:6px solid var(--accent);background:#fbfdff;padding:10px;border-radius:8px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+
+  /* Question card */
+  .q{background:linear-gradient(180deg,#fff,#fcfeff);padding:10px;border-radius:10px;border:1px solid rgba(11,61,145,0.04)}
+  .emoji{font-size:32px;margin-right:10px}
+  .q-row{display:flex;align-items:center;gap:10px}
+
+  /* Radio style options */
+  .opts{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .opts input{display:none}
+  .opts label{
+    display:inline-block;padding:8px 10px;border-radius:8px;border:2px solid transparent;background:#f7fbff;color:var(--accent);
+    cursor:pointer;font-weight:600;transition:all .18s ease;
+  }
+  .opts input:checked + label{box-shadow:0 6px 14px rgba(11,61,145,0.08);transform:translateY(-2px);border-color:rgba(11,61,145,0.12)}
+  /* correct / wrong visual feedback on selection */
+  .opts input.correct:checked + label{background:linear-gradient(180deg,#e6fff0,#e9fff6);border-color:rgba(46,139,87,0.12);color:var(--good)}
+  .opts input.wrong:checked + label{background:linear-gradient(180deg,#fff4f4,#fff7f7);border-color:rgba(192,57,43,0.12);color:var(--bad);animation:shake .45s}
+  @keyframes shake{
+    10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}
+  }
+
+  /* Flipping cards */
+  .flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+  .flip{
+    perspective:900px;
+  }
+  .flip input{display:none}
+  .card{
+    width:100%;height:120px;border-radius:10px;position:relative;transform-style:preserve-3d;transition:transform .6s;
+    box-shadow:0 6px 18px rgba(11,61,145,0.06);
+  }
+  .flip input:checked ~ .card{transform:rotateY(180deg)}
+  .card-face{
+    position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:12px;font-weight:700;font-size:14px;
+  }
+  .front{background:linear-gradient(180deg,#fff,#f3fbff);color:var(--accent);font-size:36px}
+  .back{background:linear-gradient(180deg,#eafcf0,#fff);transform:rotateY(180deg);color:var(--accent-2);padding:10px;font-size:14px}
+
+  /* Buttons / small controls */
+  .btn{display:inline-block;padding:8px 12px;border-radius:12px;background:linear-gradient(180deg,#0b6bff,#0b3d91);color:#fff;font-weight:700;cursor:pointer;border:none;box-shadow:0 6px 18px rgba(11,61,145,0.12)}
+  .btn:active{transform:scale(.98)}
+  .btn.pulse{animation:pulse 1.2s infinite}
+  @keyframes pulse{50%{transform:scale(1.03)}}
+
+  /* Short answer layout */
+  .short{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  /* Story and match */
+  .mini-list{padding-left:16px}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}
+  .match-item{padding:10px;border-radius:10px;background:#fff;border:1px dashed rgba(11,61,145,0.04)}
+
+  /* Footer answers (hidden by default collapsed) */
+  details#answers{margin-top:18px}
+  details summary{cursor:pointer;padding:10px;border-radius:8px;background:linear-gradient(180deg,#fff,#f2f8ff);font-weight:700;border:2px solid rgba(11,61,145,0.05)}
+
+  /* Responsive */
+  @media (max-width:640px){
+    header{padding:12px}
+    .tabs label{padding:8px 10px;font-size:13px}
+    .card{height:110px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="title">Magic Park — Grammar Adventure</div>
+    <div class="subtitle">Pre-A1 / Grade 2 • 60-minute lesson • Theme: Magic Park</div>
+  </div>
+
+  <nav class="nav tabs" aria-label="Sections">
+    <!-- Radio tabs -->
+    <input type="radio" name="tabs" id="tab-vocab" checked>
+    <label for="tab-vocab">Vocabulary</label>
+
+    <input type="radio" name="tabs" id="tab-grammar">
+    <label for="tab-grammar">Grammar</label>
+
+    <input type="radio" name="tabs" id="tab-reading">
+    <label for="tab-reading">Reading & Writing</label>
+  </nav>
+</header>
+
+<!-- Main content panels controlled by the radios -->
+<main>
+
+  <!-- VOCABULARY -->
+  <section id="vocabulary" class="panel">
+    <h2>Vocabulary — Magic Park animals & things</h2>
+    <p class="lead">Choose the best word. Use the emoji to help. (No answers shown here — check at the bottom.)</p>
+
+    <!-- Exercise 1: Word Choice -->
+    <div class="exercise" id="vocab-1">
+      <div class="ex-head">
+        <strong>1. Word Choice</strong>
+        <span class="rule-box" style="margin-left:auto">Pick the correct word for the emoji. Two choices each.</span>
+      </div>
+
+      <div class="grid">
+        <!-- Q1 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐸🐸</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v1" id="v1a" class="wrong"><label for="v1a">frog</label>
+            <input type="radio" name="v1" id="v1b" class="correct"><label for="v1b">frogs</label>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦆</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v2" id="v2a" class="correct"><label for="v2a">duck</label>
+            <input type="radio" name="v2" id="v2b" class="wrong"><label for="v2b">ducks</label>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🕷🕷️</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v3" id="v3a" class="wrong"><label for="v3a">spider</label>
+            <input type="radio" name="v3" id="v3b" class="correct"><label for="v3b">spiders</label>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦋</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v4" id="v4a" class="correct"><label for="v4a">butterfly</label>
+            <input type="radio" name="v4" id="v4b" class="wrong"><label for="v4b">butterflies</label>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐘🐘</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v5" id="v5a" class="wrong"><label for="v5a">elephant</label>
+            <input type="radio" name="v5" id="v5b" class="correct"><label for="v5b">elephants</label>
+          </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v6" id="v6a" class="correct"><label for="v6a">rabbit</label>
+            <input type="radio" name="v6" id="v6b" class="wrong"><label for="v6b">rabbits</label>
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐝</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v7" id="v7a" class="wrong"><label for="v7a">bees</label>
+            <input type="radio" name="v7" id="v7b" class="correct"><label for="v7b">bee</label>
+          </div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🌸🌸</div><div><strong>Which word?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="v8" id="v8a" class="correct"><label for="v8a">flower</label>
+            <input type="radio" name="v8" id="v8b" class="wrong"><label for="v8b">flowers</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exercise 2: Missing Letter -->
+    <div class="exercise" id="vocab-2">
+      <div class="ex-head">
+        <strong>2. Missing Letter</strong>
+        <span class="rule-box" style="margin-left:auto">Fill the missing letter. Look at the emoji to help.</span>
+      </div>
+
+      <div class="grid">
+        <!-- Provide 8 missing-letter items -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐸</div><div><strong>_rog</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m1" id="m1a" class="wrong"><label for="m1a">b</label>
+            <input type="radio" name="m1" id="m1b" class="correct"><label for="m1b">f</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦋</div><div><strong>butterf_ly</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m2" id="m2a" class="correct"><label for="m2a">l</label>
+            <input type="radio" name="m2" id="m2b" class="wrong"><label for="m2b">i</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🕷️</div><div><strong>sp_der</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m3" id="m3a" class="correct"><label for="m3a">i</label>
+            <input type="radio" name="m3" id="m3b" class="wrong"><label for="m3b">o</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>rab_it</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m4" id="m4a" class="wrong"><label for="m4a">b</label>
+            <input type="radio" name="m4" id="m4b" class="correct"><label for="m4b">b</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐘</div><div><strong>eleph_nt</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m5" id="m5a" class="correct"><label for="m5a">a</label>
+            <input type="radio" name="m5" id="m5b" class="wrong"><label for="m5b">o</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐝</div><div><strong>b_e</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m6" id="m6a" class="correct"><label for="m6a">e</label>
+            <input type="radio" name="m6" id="m6b" class="wrong"><label for="m6b">a</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦆</div><div><strong>d_ck</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m7" id="m7a" class="wrong"><label for="m7a">i</label>
+            <input type="radio" name="m7" id="m7b" class="correct"><label for="m7b">u</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🌸</div><div><strong>flo_ er</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="m8" id="m8a" class="correct"><label for="m8a">w</label>
+            <input type="radio" name="m8" id="m8b" class="wrong"><label for="m8b">m</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:10px;color:var(--muted)">Tip box: The lesson focus is plural rules. You will see four groups: <strong>Group A</strong> add -s; <strong>Group B</strong> add -es for sounds like -s, -sh, -ch, -x, -o; <strong>Group C</strong> consonant + y → drop y + -ies; <strong>Group D</strong> vowel + y → just -s. You will practise these rules in Grammar.</p>
+  </section>
+
+  <!-- GRAMMAR -->
+  <section id="grammar" class="panel">
+    <h2>Grammar — Plurals & Can / Can't (Magic Park)</h2>
+    <p class="lead">Learn the rules with pictures, practise many examples (60 minutes). Follow the boxed rule and do the tasks.</p>
+
+    <!-- Visual Rule Box -->
+    <div class="exercise" id="rules">
+      <div class="ex-head"><strong>Plural Rules — Visual Box</strong></div>
+      <div class="rule-box">
+        <p style="margin:6px 0"><strong>Group A:</strong> Add <em>-s</em>. Example: Frog → Frogs; Monkey → Monkeys.</p>
+        <p style="margin:6px 0"><strong>Group B:</strong> Add <em>-es</em> to words ending in sounds like -s, -sh, -ch, -x, -o. Example: Match → Matches; Fox → Foxes.</p>
+        <p style="margin:6px 0"><strong>Group C:</strong> Consonant + y: drop the y, add <em>-ies</em>. Example: Fly → Flies; Cherry → Cherries.</p>
+        <p style="margin:6px 0"><strong>Group D:</strong> Vowel + y: just add <em>-s</em>. Example: Toy → Toys; Monkey → Monkeys.</p>
+      </div>
+    </div>
+
+    <!-- Is it...? -->
+    <div class="exercise" id="grammar-1">
+      <div class="ex-head"><strong>1. Is it...?</strong><span class="rule-box" style="margin-left:auto">Answer: "Yes, it is." or "No, it isn't."</span></div>
+      <div class="grid">
+        <!-- 6 items -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦋🦋</div><div><strong>Are they butterflies?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="g1" id="g1a" class="correct"><label for="g1a">Yes, they are.</label>
+            <input type="radio" name="g1" id="g1b" class="wrong"><label for="g1b">No, they aren't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>Is it a spider?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="g2" id="g2a" class="wrong"><label for="g2a">Yes, it is.</label>
+            <input type="radio" name="g2" id="g2b" class="correct"><label for="g2b">No, it isn't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐸</div><div><strong>Is it a frog?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="g3" id="g3a" class="correct"><label for="g3a">Yes, it is.</label>
+            <input type="radio" name="g3" id="g3b" class="wrong"><label for="g3b">No, it isn't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐝</div><div><strong>Is it an elephant?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="g4" id="g4a" class="wrong"><label for="g4a">Yes, it is.</label>
+            <input type="radio" name="g4" id="g4b" class="correct"><label for="g4b">No, it isn't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐘🐘</div><div><strong>Are they foxes?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="g5" id="g5a" class="correct"><label for="g5a">Yes, they are.</label>
+            <input type="radio" name="g5" id="g5b" class="wrong"><label for="g5b">No, they aren't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦆</div><div><strong>Is it a duck?</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="g6" id="g6a" class="correct"><label for="g6a">Yes, it is.</label>
+            <input type="radio" name="g6" id="g6b" class="wrong"><label for="g6b">No, it isn't.</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrambled Sentence (large set + 10 extra = many items) -->
+    <div class="exercise" id="grammar-2">
+      <div class="ex-head"><strong>2. Scrambled Sentence — Make "It is a [word]"</strong>
+        <span class="rule-box" style="margin-left:auto">Choose the correct sentence. Then pick the emoji that matches.</span>
+      </div>
+
+      <p style="color:var(--muted);margin:6px 0">You see scrambled words. Choose the correct order (one choice is right). After you pick, find the matching emoji below each question.</p>
+
+      <div class="grid">
+        <!-- Each question: show scrambled words and three assembly options; then emoji choices -->
+        <!-- We'll provide 12 items (10 extra included). -->
+        <!-- 1 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> is / a / frog / It</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s1" id="s1a" class="wrong"><label for="s1a">A: It frog is a</label>
+            <input type="radio" name="s1" id="s1b" class="correct"><label for="s1b">B: It is a frog</label>
+            <input type="radio" name="s1" id="s1c" class="wrong"><label for="s1c">C: Is it a frog</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🐸</span><span class="emoji">🦆</span><span class="emoji">🕷️</span></div>
+        </div>
+
+        <!-- 2 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> a / is / duck / It</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s2" id="s2a" class="correct"><label for="s2a">A: It is a duck</label>
+            <input type="radio" name="s2" id="s2b" class="wrong"><label for="s2b">B: Is it duck a</label>
+            <input type="radio" name="s2" id="s2c" class="wrong"><label for="s2c">C: Duck it is a</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🦆</span><span class="emoji">🐝</span><span class="emoji">🐘</span></div>
+        </div>
+
+        <!-- 3 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> It / a / spider / is</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s3" id="s3a" class="wrong"><label for="s3a">A: Spider is a it</label>
+            <input type="radio" name="s3" id="s3b" class="correct"><label for="s3b">B: It is a spider</label>
+            <input type="radio" name="s3" id="s3c" class="wrong"><label for="s3c">C: Is a it spider</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🕷️</span><span class="emoji">🦋</span><span class="emoji">🐰</span></div>
+        </div>
+
+        <!-- 4 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> is / It / butterfly / a</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s4" id="s4a" class="wrong"><label for="s4a">A: It butterfly is a</label>
+            <input type="radio" name="s4" id="s4b" class="correct"><label for="s4b">B: It is a butterfly</label>
+            <input type="radio" name="s4" id="s4c" class="wrong"><label for="s4c">C: Is it a butterfly</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🦋</span><span class="emoji">🐘</span><span class="emoji">🐝</span></div>
+        </div>
+
+        <!-- 5 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> is / a / elephant / It</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s5" id="s5a" class="wrong"><label for="s5a">A: Elephant it is a</label>
+            <input type="radio" name="s5" id="s5b" class="correct"><label for="s5b">B: It is a elephant</label>
+            <input type="radio" name="s5" id="s5c" class="wrong"><label for="s5c">C: Is it a elephant</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🐘</span><span class="emoji">🐰</span><span class="emoji">🐝</span></div>
+        </div>
+
+        <!-- 6 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> a / is / rabbit / It</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s6" id="s6a" class="correct"><label for="s6a">A: It is a rabbit</label>
+            <input type="radio" name="s6" id="s6b" class="wrong"><label for="s6b">B: Is rabbit it a</label>
+            <input type="radio" name="s6" id="s6c" class="wrong"><label for="s6c">C: Rabbit is a it</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🐰</span><span class="emoji">🐸</span><span class="emoji">🦋</span></div>
+        </div>
+
+        <!-- 7 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> a / toy / is / It</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s7" id="s7a" class="wrong"><label for="s7a">A: Toy it is a</label>
+            <input type="radio" name="s7" id="s7b" class="correct"><label for="s7b">B: It is a toy</label>
+            <input type="radio" name="s7" id="s7c" class="wrong"><label for="s7c">C: Is a it toy</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🧸</span><span class="emoji">🌸</span><span class="emoji">🐝</span></div>
+        </div>
+
+        <!-- 8 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> a / cherries / are / These</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s8" id="s8a" class="wrong"><label for="s8a">A: These are a cherries</label>
+            <input type="radio" name="s8" id="s8b" class="correct"><label for="s8b">B: These are cherries</label>
+            <input type="radio" name="s8" id="s8c" class="wrong"><label for="s8c">C: Are these cherries a</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🍒</span><span class="emoji">🌸</span><span class="emoji">🦋</span></div>
+        </div>
+
+        <!-- 9 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> is / It / a / fox</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s9" id="s9a" class="correct"><label for="s9a">A: It is a fox</label>
+            <input type="radio" name="s9" id="s9b" class="wrong"><label for="s9b">B: Is a it fox</label>
+            <input type="radio" name="s9" id="s9c" class="wrong"><label for="s9c">C: Fox it is a</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🦊</span><span class="emoji">🐘</span><span class="emoji">🐝</span></div>
+        </div>
+
+        <!-- 10 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> are / These / birds</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s10" id="s10a" class="wrong"><label for="s10a">A: These bird are</label>
+            <input type="radio" name="s10" id="s10b" class="correct"><label for="s10b">B: These are birds</label>
+            <input type="radio" name="s10" id="s10c" class="wrong"><label for="s10c">C: Are these bird</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🐦</span><span class="emoji">🐰</span><span class="emoji">🦋</span></div>
+        </div>
+
+        <!-- 11 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> is / a / fox / It</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s11" id="s11a" class="correct"><label for="s11a">A: It is a fox</label>
+            <input type="radio" name="s11" id="s11b" class="wrong"><label for="s11b">B: Fox a it is</label>
+            <input type="radio" name="s11" id="s11c" class="wrong"><label for="s11c">C: Is it a fox</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🦊</span><span class="emoji">🐸</span><span class="emoji">🕷️</span></div>
+        </div>
+
+        <!-- 12 -->
+        <div class="q">
+          <div><strong>Scramble:</strong> is / It / a / toy</div>
+          <div class="opts" style="margin-top:8px">
+            <input type="radio" name="s12" id="s12a" class="wrong"><label for="s12a">A: It toy is a</label>
+            <input type="radio" name="s12" id="s12b" class="correct"><label for="s12b">B: It is a toy</label>
+            <input type="radio" name="s12" id="s12c" class="wrong"><label for="s12c">C: Toy it is a</label>
+          </div>
+          <div style="margin-top:8px">Pick emoji: <span class="emoji">🧸</span><span class="emoji">🌸</span><span class="emoji">🐝</span></div>
+        </div>
+      </div>
+      <!-- Note: above we added many items (12) — this includes the +10 extra examples requested -->
+    </div>
+
+    <!-- Emoji Check (lots of examples — +10 extras included) -->
+    <div class="exercise" id="grammar-3">
+      <div class="ex-head"><strong>3. Emoji Check — True or False</strong>
+        <span class="rule-box" style="margin-left:auto">Read the sentence. Press "Yes" or "No".</span>
+      </div>
+
+      <p class="lead" style="margin-bottom:8px;color:var(--muted)">There are many short statements. Choose the correct answer.</p>
+
+      <div class="grid">
+        <!-- We'll provide 12 statements (10 extra included) -->
+        <!-- 1 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐸</div><div><strong>There are two frogs.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e1" id="e1a" class="wrong"><label for="e1a">Yes</label>
+            <input type="radio" name="e1" id="e1b" class="correct"><label for="e1b">No</label>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦆</div><div><strong>This is a duck.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e2" id="e2a" class="correct"><label for="e2a">Yes</label>
+            <input type="radio" name="e2" id="e2b" class="wrong"><label for="e2b">No</label>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🕷️</div><div><strong>It can climb.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e3" id="e3a" class="correct"><label for="e3a">Yes</label>
+            <input type="radio" name="e3" id="e3b" class="wrong"><label for="e3b">No</label>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦋</div><div><strong>This animal can fly.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e4" id="e4a" class="correct"><label for="e4a">Yes</label>
+            <input type="radio" name="e4" id="e4b" class="wrong"><label for="e4b">No</label>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐘</div><div><strong>Elephants are small.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e5" id="e5a" class="wrong"><label for="e5a">Yes</label>
+            <input type="radio" name="e5" id="e5b" class="correct"><label for="e5b">No</label>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>Rabbits have long ears.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e6" id="e6a" class="correct"><label for="e6a">Yes</label>
+            <input type="radio" name="e6" id="e6b" class="wrong"><label for="e6b">No</label>
+          </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐝</div><div><strong>Bees can't fly.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e7" id="e7a" class="correct"><label for="e7a">Yes</label>
+            <input type="radio" name="e7" id="e7b" class="wrong"><label for="e7b">No</label>
+          </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🌸</div><div><strong>Flowers are pets.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e8" id="e8a" class="wrong"><label for="e8a">Yes</label>
+            <input type="radio" name="e8" id="e8b" class="correct"><label for="e8b">No</label>
+          </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🧸</div><div><strong>Toys are for children.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e9" id="e9a" class="correct"><label for="e9a">Yes</label>
+            <input type="radio" name="e9" id="e9b" class="wrong"><label for="e9b">No</label>
+          </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🍒</div><div><strong>Cherries are red.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e10" id="e10a" class="correct"><label for="e10a">Yes</label>
+            <input type="radio" name="e10" id="e10b" class="wrong"><label for="e10b">No</label>
+          </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦊</div><div><strong>Foxes can fly.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e11" id="e11a" class="wrong"><label for="e11a">Yes</label>
+            <input type="radio" name="e11" id="e11b" class="correct"><label for="e11b">No</label>
+          </div>
+        </div>
+
+        <!-- 12 -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐦</div><div><strong>Birds can fly.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="e12" id="e12a" class="correct"><label for="e12a">Yes</label>
+            <input type="radio" name="e12" id="e12b" class="wrong"><label for="e12b">No</label>
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--muted);margin-top:10px">(This section includes many items — 12 statements for lots of practice.)</p>
+    </div>
+
+    <!-- Flipping Cards -->
+    <div class="exercise" id="grammar-4">
+      <div class="ex-head"><strong>4. Flipping Cards — Say the sentence before you flip</strong>
+        <span class="rule-box" style="margin-left:auto">Flip the card to check.</span>
+      </div>
+
+      <div class="flip-grid">
+        <!-- 6 flip cards -->
+        <div class="flip">
+          <input type="checkbox" id="flip1">
+          <div class="card">
+            <div class="card-face front"><label for="flip1" style="cursor:pointer">🕷️</label></div>
+            <div class="card-face back"><label for="flip1" style="cursor:pointer">I am a spider. I can climb. I've got eight legs.</label></div>
+          </div>
+        </div>
+
+        <div class="flip">
+          <input type="checkbox" id="flip2">
+          <div class="card">
+            <div class="card-face front"><label for="flip2" style="cursor:pointer">🦋</label></div>
+            <div class="card-face back"><label for="flip2" style="cursor:pointer">I am a butterfly. I can fly. I've got two wings.</label></div>
+          </div>
+        </div>
+
+        <div class="flip">
+          <input type="checkbox" id="flip3">
+          <div class="card">
+            <div class="card-face front"><label for="flip3" style="cursor:pointer">🐰</label></div>
+            <div class="card-face back"><label for="flip3" style="cursor:pointer">I am a rabbit. I can jump. I've got long ears.</label></div>
+          </div>
+        </div>
+
+        <div class="flip">
+          <input type="checkbox" id="flip4">
+          <div class="card">
+            <div class="card-face front"><label for="flip4" style="cursor:pointer">🐸</label></div>
+            <div class="card-face back"><label for="flip4" style="cursor:pointer">I am a frog. I can hop. I've got big eyes.</label></div>
+          </div>
+        </div>
+
+        <div class="flip">
+          <input type="checkbox" id="flip5">
+          <div class="card">
+            <div class="card-face front"><label for="flip5" style="cursor:pointer">🐘</label></div>
+            <div class="card-face back"><label for="flip5" style="cursor:pointer">I am an elephant. I can trumpet. I've got a long trunk.</label></div>
+          </div>
+        </div>
+
+        <div class="flip">
+          <input type="checkbox" id="flip6">
+          <div class="card">
+            <div class="card-face front"><label for="flip6" style="cursor:pointer">🐝</label></div>
+            <div class="card-face back"><label for="flip6" style="cursor:pointer">I am a bee. I can fly. I've got small wings.</label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Short Answers / Can / Can't -->
+    <div class="exercise" id="grammar-5">
+      <div class="ex-head"><strong>5. Short Answers & Can / Can't</strong>
+        <span class="rule-box" style="margin-left:auto">Answer using "Yes, it can." or "No, it can't."</span>
+      </div>
+
+      <div class="grid">
+        <!-- 6 short answer items -->
+        <div class="q">
+          <div class="q-row"><div class="emoji">🕷️</div><div><strong>Can it climb?</strong></div></div>
+          <div class="short">
+            <input type="radio" name="c1" id="c1a" class="correct"><label for="c1a">Yes, it can.</label>
+            <input type="radio" name="c1" id="c1b" class="wrong"><label for="c1b">No, it can't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦋</div><div><strong>Can it jump?</strong></div></div>
+          <div class="short">
+            <input type="radio" name="c2" id="c2a" class="wrong"><label for="c2a">Yes, it can.</label>
+            <input type="radio" name="c2" id="c2b" class="correct"><label for="c2b">No, it can't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>Can it jump?</strong></div></div>
+          <div class="short">
+            <input type="radio" name="c3" id="c3a" class="correct"><label for="c3a">Yes, it can.</label>
+            <input type="radio" name="c3" id="c3b" class="wrong"><label for="c3b">No, it can't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐘</div><div><strong>Can it fly?</strong></div></div>
+          <div class="short">
+            <input type="radio" name="c4" id="c4a" class="wrong"><label for="c4a">Yes, it can.</label>
+            <input type="radio" name="c4" id="c4b" class="correct"><label for="c4b">No, it can't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐝</div><div><strong>Can it make honey?</strong></div></div>
+          <div class="short">
+            <input type="radio" name="c5" id="c5a" class="correct"><label for="c5a">Yes, it can.</label>
+            <input type="radio" name="c5" id="c5b" class="wrong"><label for="c5b">No, it can't.</label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦊</div><div><strong>Can it swim?</strong></div></div>
+          <div class="short">
+            <input type="radio" name="c6" id="c6a" class="wrong"><label for="c6a">Yes, it can.</label>
+            <input type="radio" name="c6" id="c6b" class="correct"><label for="c6b">No, it can't.</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:10px;color:var(--muted)">Irregular plurals (exceptions) box: tooth → teeth; foot → feet; mouse → mice; child → children. These are helpers — practise with the flashcards above.</p>
+  </section>
+
+  <!-- READING & WRITING -->
+  <section id="reading" class="panel">
+    <h2>Reading & Writing — Magic Park Mini-Texts</h2>
+    <p class="lead">Read short text, answer True / False, guess missing words and match descriptions.</p>
+
+    <!-- Pre-A1 Story -->
+    <div class="exercise" id="read-1">
+      <div class="ex-head"><strong>1. Mini Story (3-5 sentences)</strong><span class="rule-box" style="margin-left:auto">Read and choose True / False.</span></div>
+
+      <div class="card" style="padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#f6fff8);border:1px solid rgba(11,107,71,0.04)">
+        <p style="margin:6px 0"><strong>Magic Park</strong> — Tim sees one frog and two ducks. He sees a big butterfly. The rabbit jumps. Tim is happy.</p>
+      </div>
+
+      <div style="margin-top:10px" class="opts">
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐸</div><div><strong>There are two frogs.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="t1" id="t1a" class="wrong"><label for="t1a">True</label>
+            <input type="radio" name="t1" id="t1b" class="correct"><label for="t1b">False</label>
+          </div>
+        </div>
+
+        <div class="q" style="margin-top:8px">
+          <div class="q-row"><div class="emoji">🦋</div><div><strong>Tim sees a big butterfly.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="t2" id="t2a" class="correct"><label for="t2a">True</label>
+            <input type="radio" name="t2" id="t2b" class="wrong"><label for="t2b">False</label>
+          </div>
+        </div>
+
+        <div class="q" style="margin-top:8px">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>The rabbit can fly.</strong></div></div>
+          <div class="opts">
+            <input type="radio" name="t3" id="t3a" class="wrong"><label for="t3a">True</label>
+            <input type="radio" name="t3" id="t3b" class="correct"><label for="t3b">False</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guess the Word -->
+    <div class="exercise" id="read-2">
+      <div class="ex-head"><strong>2. Guess the Word</strong><span class="rule-box" style="margin-left:auto">Look at the emoji and complete the sentence.</span></div>
+
+      <div class="grid">
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐸</div><div><strong>It is a little _ _ o g.</strong></div></div>
+          <div style="margin-top:8px"><em>Write the missing letters:</em> <input aria-label="answer1" style="padding:6px;border-radius:6px;border:1px solid rgba(11,61,145,0.06)"></div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🦋</div><div><strong>It is a big but__rfly.</strong></div></div>
+          <div style="margin-top:8px"><em>Write the missing letters:</em> <input aria-label="answer2" style="padding:6px;border-radius:6px;border:1px solid rgba(11,61,145,0.06)"></div>
+        </div>
+
+        <div class="q">
+          <div class="q-row"><div class="emoji">🐰</div><div><strong>The rab_it can jump.</strong></div></div>
+          <div style="margin-top:8px"><em>Write the missing letter:</em> <input aria-label="answer3" style="padding:6px;border-radius:6px;border:1px solid rgba(11,61,145,0.06)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini-Text Match -->
+    <div class="exercise" id="read-3">
+      <div class="ex-head"><strong>3. Mini-Text Match</strong><span class="rule-box" style="margin-left:auto">Match each emoji to the correct short description.</span></div>
+
+      <div class="match-grid">
+        <div class="match-item">
+          <div style="font-size:28px"></div>
+          <div style="margin-top:8px">I hop and I like water.</div>
+        </div>
+        <div class="match-item">
+          <div style="font-size:28px"></div>
+          <div style="margin-top:8px">I am pretty. I fly with two wings.</div>
+        </div>
+        <div class="match-item">
+          <div style="font-size:28px"></div>
+          <div style="margin-top:8px">I jump high and I have long ears.</div>
+        </div>
+
+        <div style="grid-column:span 2;margin-top:8px;color:var(--muted)"> 1:🐸, 2:🦋, 3:🐰.</div>
+      </div>
+    </div>
+
+    <p style="margin-top:12px;color:var(--muted)">This Reading & Writing section includes writing practice and matching to support speaking. Use the mini story for oral practice with "I've got" sentences in the Grammar section.</p>
+  </section>
+
+  <!-- Hidden answers at the very bottom -->
+  <details id="answers">
+    <summary>Answers (click to reveal) — Teacher / Self-check</summary>
+    <div style="padding:12px">
+      <h3>Vocabulary — Answers</h3>
+      <ol>
+        <li>Vocab Word Choice: 1: frogs, 2: duck, 3: spiders, 4: butterfly, 5: elephants, 6: rabbit, 7: bee, 8: flower</li>
+        <li>Missing Letters: _rog → f; butterf_ly → l; sp_d_r → i; rab_it → b; eleph_nt → a; b_e → e; d_ck → u; flo_ er → w</li>
+      </ol>
+
+      <h3>Grammar — Answers</h3>
+      <ol>
+        <li>Is it...?: g1 Yes, g2 No, g3 Yes, g4 No, g5 Yes, g6 Yes</li>
+        <li>Scrambled Sentences (correct choices): s1 B, s2 A, s3 B, s4 B, s5 B, s6 A, s7 B, s8 B, s9 A, s10 B, s11 A, s12 B</li>
+        <li>Emoji Check (True/False): e1 No, e2 Yes, e3 Yes, e4 Yes, e5 No, e6 Yes, e7 Yes, e8 No, e9 Yes, e10 Yes, e11 No, e12 Yes</li>
+        <li>Short Answers / Can: c1 Yes, c2 No, c3 Yes, c4 No, c5 Yes, c6 No</li>
+        <li>Flip cards — sample phrases shown on back of each card (see card backs)</li>
+        <li>Irregular plurals: tooth → teeth; foot → feet; mouse → mice; child → children</li>
+      </ol>
+
+      <h3>Reading & Writing — Answers</h3>
+      <ol>
+        <li>Mini story T/F: t1 False (one frog), t2 True, t3 False</li>
+        <li>Guess the Word inputs (examples): frog → letters "f r o g"; butterfly → "t e r" for the blank; rabbit → "b"</li>
+        <li>Mini-Text Match: 1 → 🐸, 2 → 🦋, 3 → 🐰</li>
+      </ol>
+
+      <p style="margin-top:8px;color:var(--muted)">Use answers only after students finish. For assessment, ask students to read sentences aloud using "I've got ___ and I can ___" (spider, butterfly, rabbit). Example practice sentences (teacher): "I'm little. I've got eight legs and I can climb." "I'm beautiful. I've got two wings and I can fly." "I'm soft. I've got long ears and I can jump."</p>
+    </div>
+  </details>
+
+</main>
+
+<!-- Small footer reminder about image mode (per platform rule) -->
+<footer style="max-width:980px;margin:10px auto 40px;padding:0 18px;color:var(--muted);font-size:13px">
+  By the way, Image Generation mode is active — if you'd like me to create printable cards or illustrated versions of this lesson (PDF or PNG), tell me which style you want (e.g., cute cartoon, realistic, or clip-art) and I will generate them.
+</footer>
+
+</body>
+</html>

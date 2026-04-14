@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔢 Numbers 10-20 · reading game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', 'Raleway', system-ui, sans-serif;
+      background: #1a3a2e;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .game-container {
+      max-width: 1000px;
+      width: 100%;
+      background: #eaf4e8;
+      border-radius: 48px;
+      padding: 24px 28px 32px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.4), inset 0 0 0 2px #b6d7a8;
+      border: 2px solid #4a7856;
+    }
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #1e4620;
+      text-align: center;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 0 #cfe8c7;
+      letter-spacing: 1px;
+    }
+    .level-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .level-btn {
+      background: #c0dbb8;
+      padding: 14px 28px;
+      border-radius: 60px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1a4020;
+      box-shadow: 0 6px 0 #5b7e5a, 0 3px 8px rgba(0,0,0,0.2);
+      border: 2px solid #427e4a;
+      cursor: pointer;
+      transition: all 0.1s;
+      user-select: none;
+    }
+    .level-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 9px 0 #3b5e3a, 0 4px 10px black;
+      background: #d4efcb;
+    }
+    .level-panel {
+      background: #f6fff2;
+      border-radius: 40px;
+      padding: 24px 24px 32px;
+      border: 3px solid #618a5e;
+      box-shadow: inset 0 0 0 3px #cce6c0, 0 8px 0 #2c4d2a;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 24px;
+    }
+    .card {
+      background: #fefee4;
+      border-radius: 30px;
+      padding: 20px 18px;
+      box-shadow: 0 7px 0 #7e9f73, inset 0 1px 4px #fff8e0;
+      border: 2px solid #8ab87a;
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1f3b1d;
+      cursor: pointer;
+      transition: 0.1s;
+      user-select: none;
+    }
+    .card.selected {
+      background: #fbe38e;
+      border: 5px solid #d48f2b;
+      box-shadow: 0 4px 0 #a06b1f, inset 0 1px 5px white;
+      transform: scale(0.98);
+    }
+    .card.matched {
+      opacity: 0.6;
+      background: #b1cfaa;
+      border: 3px dashed #2d5a2d;
+      box-shadow: inset 0 0 0 2px #ecfae7;
+      pointer-events: none;
+      text-decoration: line-through 2px #1e4f1e;
+    }
+    .option-btn {
+      background: #deedd6;
+      border-radius: 50px;
+      padding: 14px 18px;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #153015;
+      border: 2px solid #5e9660;
+      box-shadow: 0 5px 0 #3c6a40;
+      cursor: pointer;
+      text-align: center;
+      transition: 0.05s;
+    }
+    .option-btn.correct-glow {
+      background: #a5d6a5;
+      box-shadow: 0 0 0 4px #ffe484;
+      border-color: #1f5c1f;
+    }
+    .option-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #2f5a32; }
+    .listen-btn {
+      background: #639cbf;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      padding: 16px 30px;
+      border-radius: 60px;
+      box-shadow: 0 6px 0 #2e5470;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 25px;
+    }
+    .emoji-big {
+      font-size: 4.5rem;
+      line-height: 1.3;
+    }
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    .message {
+      font-size: 1.8rem;
+      margin: 15px 0;
+      min-height: 3rem;
+      color: #1d431d;
+    }
+    .hidden {
+      display: none;
+    }
+    hr {
+      margin: 20px 0;
+      border: 3px dotted #558b55;
+    }
+    .restart-link {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #1d4f1d;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <h1>🔢 NUMBERS 10–20 🔢</h1>
+  <!-- radio tabs -->
+  <input type="radio" name="levelTab" id="tab1" checked hidden>
+  <input type="radio" name="levelTab" id="tab2" hidden>
+  <input type="radio" name="levelTab" id="tab3" hidden>
+
+  <div class="level-tabs">
+    <label for="tab1" class="level-btn">📇 LEVEL 1 · Match</label>
+    <label for="tab2" class="level-btn">🔤 LEVEL 2 · Choice</label>
+    <label for="tab3" class="level-btn">🎧 LEVEL 3 · Listen</label>
+  </div>
+
+  <!-- LEVEL 1: карточки -->
+  <div id="level1Panel" class="level-panel">
+    <h2 style="color:#235b2e; margin-bottom:15px;">🔤 match word + emoji</h2>
+    <div id="cardGrid" class="grid-2"></div>
+    <p id="level1Message" class="message"></p>
+    <span class="restart-link" id="resetLevel1">⟲ play again</span>
+  </div>
+
+  <!-- LEVEL 2: множественный выбор -->
+  <div id="level2Panel" class="level-panel hidden">
+    <h2 style="color:#235b2e;">🔎 choose the correct word</h2>
+    <div id="quizArea">
+      <div id="questionEmoji" style="font-size:6rem; text-align:center; margin:10px 0;">🔟</div>
+      <div id="optionsContainer" class="grid-2" style="margin-top:20px;"></div>
+      <p id="level2Message" class="message"></p>
+      <button id="nextLevel2Btn" class="listen-btn" style="font-size:1.5rem; padding:12px 24px;">Next →</button>
+    </div>
+    <span class="restart-link" id="resetLevel2">↻ restart level 2</span>
+  </div>
+
+  <!-- LEVEL 3: аудирование -->
+  <div id="level3Panel" class="level-panel hidden">
+    <h2 style="color:#235b2e;">🎤 listen & tap the emoji</h2>
+    <div class="flex-row">
+      <button id="speakBtn" class="listen-btn">🔊 LISTEN</button>
+      <span id="listenHint" style="font-size:2rem;"></span>
+    </div>
+    <div id="emojiOptionsListen" class="grid-2" style="margin:20px 0;"></div>
+    <p id="level3Message" class="message"></p>
+    <span class="restart-link" id="resetLevel3">🔄 restart listening</span>
+  </div>
+  <hr>
+  <div style="font-size:1.3rem; color:#2c5c2c;">✨ Pre‑A1 · numbers 10–20 ✨</div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- ДАННЫЕ по теме numbers 10-20 ----------
+    // Level 1: 4 пары "слово + эмодзи" (числа 10,12,15,20)
+    const level1Data = [
+      { word: "ten", emoji: "🔟" },
+      { word: "twelve", emoji: "1️⃣2️⃣" },
+      { word: "fifteen", emoji: "1️⃣5️⃣" },
+      { word: "twenty", emoji: "2️⃣0️⃣" }
+    ];
+
+    // Level 2: вопросы — эмодзи + 4 варианта (1 правильный)
+    const questions2 = [
+      { emoji: "🔟", options: ["ten", "tan", "teen", "tenn"], correct: "ten" },
+      { emoji: "1️⃣1️⃣", options: ["eleven", "elevenn", "elven", "elevn"], correct: "eleven" },
+      { emoji: "1️⃣2️⃣", options: ["twelve", "twelv", "twelf", "twelwe"], correct: "twelve" },
+      { emoji: "1️⃣3️⃣", options: ["thirteen", "thirteen", "thirten", "thirtin"], correct: "thirteen" },
+      { emoji: "1️⃣4️⃣", options: ["fourteen", "forteen", "fourten", "fourteen"], correct: "fourteen" },
+      { emoji: "1️⃣5️⃣", options: ["fifteen", "fiften", "fiveteen", "fifteenth"], correct: "fifteen" },
+      { emoji: "1️⃣6️⃣", options: ["sixteen", "sixten", "sixsteen", "sixteen"], correct: "sixteen" },
+      { emoji: "1️⃣7️⃣", options: ["seventeen", "seventen", "seventeen", "sevnteen"], correct: "seventeen" },
+      { emoji: "1️⃣8️⃣", options: ["eighteen", "eighten", "eigteen", "eightteen"], correct: "eighteen" },
+      { emoji: "1️⃣9️⃣", options: ["nineteen", "nineten", "ninteen", "ninteen"], correct: "nineteen" },
+      { emoji: "2️⃣0️⃣", options: ["twenty", "tweny", "twentee", "twenti"], correct: "twenty" }
+    ];
+
+    // Level 3: слова для произношения + маппинг на эмодзи
+    const targetWords3 = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+    const wordEmojiMap = {
+      "ten": "🔟",
+      "eleven": "1️⃣1️⃣",
+      "twelve": "1️⃣2️⃣",
+      "thirteen": "1️⃣3️⃣",
+      "fourteen": "1️⃣4️⃣",
+      "fifteen": "1️⃣5️⃣",
+      "sixteen": "1️⃣6️⃣",
+      "seventeen": "1️⃣7️⃣",
+      "eighteen": "1️⃣8️⃣",
+      "nineteen": "1️⃣9️⃣",
+      "twenty": "2️⃣0️⃣"
+    };
+
+    // ---------- DOM элементы ----------
+    const panel1 = document.getElementById('level1Panel');
+    const panel2 = document.getElementById('level2Panel');
+    const panel3 = document.getElementById('level3Panel');
+    const tabs = document.querySelectorAll('input[name="levelTab"]');
+    function switchPanel() {
+      if (document.getElementById('tab1').checked) {
+        panel1.classList.remove('hidden');
+        panel2.classList.add('hidden');
+        panel3.classList.add('hidden');
+      } else if (document.getElementById('tab2').checked) {
+        panel1.classList.add('hidden');
+        panel2.classList.remove('hidden');
+        panel3.classList.add('hidden');
+        initLevel2();
+      } else {
+        panel1.classList.add('hidden');
+        panel2.classList.add('hidden');
+        panel3.classList.remove('hidden');
+        initLevel3();
+      }
+    }
+    tabs.forEach(t => t.addEventListener('change', switchPanel));
+
+    // ------------- LEVEL 1 (match) -------------
+    let level1Cards = [];
+    let selectedIndex = null;
+    let matchedPairs = 0;
+    const gridEl = document.getElementById('cardGrid');
+    const msg1 = document.getElementById('level1Message');
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function buildLevel1() {
+      const items = [];
+      level1Data.forEach((item, idx) => {
+        items.push({ type: 'word', value: item.word, pairId: idx, emoji: item.emoji });
+        items.push({ type: 'emoji', value: item.emoji, pairId: idx, word: item.word });
+      });
+      level1Cards = shuffleArray(items);
+      matchedPairs = 0;
+      selectedIndex = null;
+      renderLevel1();
+      msg1.textContent = 'Click a card, then find its pair!';
+    }
+
+    function renderLevel1() {
+      gridEl.innerHTML = '';
+      level1Cards.forEach((card, i) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        if (card.matched) cardDiv.classList.add('matched');
+        if (selectedIndex === i) cardDiv.classList.add('selected');
+        cardDiv.textContent = card.type === 'word' ? card.value : card.value;
+        cardDiv.dataset.index = i;
+        cardDiv.addEventListener('click', () => handleCardClick(i));
+        gridEl.appendChild(cardDiv);
+      });
+    }
+
+    function handleCardClick(idx) {
+      if (level1Cards[idx].matched) return;
+      if (selectedIndex === null) {
+        selectedIndex = idx;
+        renderLevel1();
+        return;
+      }
+      if (selectedIndex === idx) {
+        selectedIndex = null;
+        renderLevel1();
+        return;
+      }
+      const cardA = level1Cards[selectedIndex];
+      const cardB = level1Cards[idx];
+      if (cardA.pairId === cardB.pairId && cardA.type !== cardB.type) {
+        cardA.matched = true;
+        cardB.matched = true;
+        matchedPairs++;
+        selectedIndex = null;
+        renderLevel1();
+        if (matchedPairs === level1Data.length) {
+          msg1.textContent = '🎉 Perfect! All matched!';
+        } else {
+          msg1.textContent = '✅ Good! Keep going.';
+        }
+      } else {
+        selectedIndex = null;
+        renderLevel1();
+        msg1.textContent = '❌ Not a pair, try again.';
+      }
+    }
+
+    document.getElementById('resetLevel1').addEventListener('click', () => {
+      buildLevel1();
+    });
+
+    // ------------- LEVEL 2 (multiple choice) -------------
+    let currentQIndex = 0;
+    const questionEmoji = document.getElementById('questionEmoji');
+    const optionsDiv = document.getElementById('optionsContainer');
+    const msg2 = document.getElementById('level2Message');
+    const nextBtn = document.getElementById('nextLevel2Btn');
+    let level2Completed = false;
+
+    function initLevel2() {
+      currentQIndex = 0;
+      level2Completed = false;
+      shuffleArray(questions2);
+      renderQuestion2();
+      nextBtn.style.display = 'inline-block';
+    }
+
+    function renderQuestion2() {
+      if (currentQIndex >= questions2.length) {
+        questionEmoji.textContent = '🏁';
+        optionsDiv.innerHTML = '';
+        msg2.textContent = '✨ Level 2 complete! ✨';
+        nextBtn.style.display = 'none';
+        level2Completed = true;
+        return;
+      }
+      const q = questions2[currentQIndex];
+      questionEmoji.textContent = q.emoji;
+      const shuffledOpts = shuffleArray([...q.options]);
+      optionsDiv.innerHTML = '';
+      shuffledOpts.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.addEventListener('click', (e) => {
+          if (level2Completed) return;
+          const allOpts = optionsDiv.querySelectorAll('.option-btn');
+          if (opt === q.correct) {
+            btn.classList.add('correct-glow');
+            msg2.textContent = '✅ Correct!';
+            allOpts.forEach(b => b.style.pointerEvents = 'none');
+          } else {
+            btn.style.background = '#f4acb7';
+            msg2.textContent = '❌ Try another!';
+            btn.style.pointerEvents = 'none';
+          }
+        });
+        optionsDiv.appendChild(btn);
+      });
+      msg2.textContent = `Question ${currentQIndex+1} / ${questions2.length}`;
+      nextBtn.style.display = 'inline-block';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (level2Completed) return;
+      const allOpts = optionsDiv.querySelectorAll('.option-btn');
+      let answered = false;
+      for (let btn of allOpts) {
+        if (btn.classList.contains('correct-glow') || btn.style.pointerEvents === 'none') answered = true;
+      }
+      if (!answered) {
+        msg2.textContent = '⚠️ Choose an answer first!';
+        return;
+      }
+      currentQIndex++;
+      renderQuestion2();
+    });
+
+    document.getElementById('resetLevel2').addEventListener('click', () => {
+      initLevel2();
+    });
+
+    // ------------- LEVEL 3 (listening) -------------
+    let currentWordIndex3 = 0;
+    let level3Words = [];
+    const speakBtn = document.getElementById('speakBtn');
+    const listenHint = document.getElementById('listenHint');
+    const emojiListenDiv = document.getElementById('emojiOptionsListen');
+    const msg3 = document.getElementById('level3Message');
+
+    function initLevel3() {
+      level3Words = shuffleArray([...targetWords3]);
+      currentWordIndex3 = 0;
+      renderListenOptions();
+      updateListenHint();
+    }
+
+    function updateListenHint() {
+      if (currentWordIndex3 < level3Words.length) {
+        listenHint.textContent = `🔊 word ${currentWordIndex3+1}/${level3Words.length}`;
+      } else {
+        listenHint.textContent = '🎓 Well done!';
+      }
+    }
+
+    function renderListenOptions() {
+      if (currentWordIndex3 >= level3Words.length) {
+        emojiListenDiv.innerHTML = '';
+        msg3.textContent = '🌟 Amazing! You finished level 3.';
+        return;
+      }
+      const currentWord = level3Words[currentWordIndex3];
+      const correctEmoji = wordEmojiMap[currentWord];
+      const allEmojis = Object.values(wordEmojiMap);
+      let options = [correctEmoji];
+      while (options.length < 4) {
+        const randEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
+        if (!options.includes(randEmoji)) options.push(randEmoji);
+      }
+      options = shuffleArray(options);
+      emojiListenDiv.innerHTML = '';
+      options.forEach(em => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.textContent = em;
+        card.addEventListener('click', () => {
+          if (em === correctEmoji) {
+            msg3.textContent = `✅ Yes! It's "${currentWord}"`;
+            currentWordIndex3++;
+            if (currentWordIndex3 < level3Words.length) {
+              renderListenOptions();
+              updateListenHint();
+            } else {
+              emojiListenDiv.innerHTML = '';
+              msg3.textContent = '🎉 You finished listening! 🎉';
+              listenHint.textContent = '⭐ complete';
+            }
+          } else {
+            msg3.textContent = `❌ Not that one. Listen again!`;
+            card.style.transform = 'translateX(4px)';
+            setTimeout(()=> card.style.transform = '', 100);
+          }
+        });
+        emojiListenDiv.appendChild(card);
+      });
+      msg3.textContent = `Which emoji means "${currentWord}"?`;
+    }
+
+    speakBtn.addEventListener('click', () => {
+      if (currentWordIndex3 >= level3Words.length) {
+        msg3.textContent = 'All words done! Restart.';
+        return;
+      }
+      const word = level3Words[currentWordIndex3];
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      speechSynthesis.speak(utterance);
+      msg3.textContent = `🔊 listening... "${word}"`;
+    });
+
+    document.getElementById('resetLevel3').addEventListener('click', () => {
+      initLevel3();
+    });
+
+    // инициализация первого уровня
+    buildLevel1();
+    panel2.classList.add('hidden');
+    panel3.classList.add('hidden');
+    switchPanel();
+
+    window.initLevel2 = initLevel2;
+    window.initLevel3 = initLevel3;
+  })();
+</script>
+</body>
+</html>
